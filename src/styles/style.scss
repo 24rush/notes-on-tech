@@ -15,3 +15,77 @@
 @layer utilities {
   @import "utilities";
 }
+
+details {
+  border-width: 1px;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+a {
+  overflow-wrap: anywhere;
+}
+
+.gist tr {
+  border: 0;
+}
+
+img[alt$=">"] {
+  float: right;
+}
+
+img[alt$="<"] {
+  float: left;
+}
+
+img[alt$="><"] {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: auto;
+  float: none!important;
+}
+
+p img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: auto;
+  float: none!important;
+}
+
+.prose :where(div[data-node-type=callout]):not(:where([class~=not-prose] *)) {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 1rem 1.5rem;
+  gap: .5rem;
+  border-radius: .5rem;
+  margin: 1rem 0;
+  word-break: break-word
+}
+
+h2 code {
+  border-radius: 0.25rem;
+  font-weight: 400!important;
+  padding: 0.25rem;
+  --tw-text-opacity: 1;
+  color: rgba(0,0,0,var(--tw-text-opacity));
+  font-size: 80%;
+  background: #f0efed;
+}
+
+strong {
+  font-weight: 700!important;
+}
+
+em {
+  font-weight: 600;
+}

@@ -7,8 +7,15 @@ import { getSinglePage } from "@lib/contentParser.astro";
 import { sortByDate } from "@lib/utils/sortFunctions";
 
 const posts = await getSinglePage("posts");
-const sortedPosts = sortByDate(posts);
+let sortedPosts = sortByDate(posts);
 const totalPages = Math.ceil(posts.length / config.settings.pagination);
+
+const pinnedPosts = sortedPosts.filter(p => p.data.pinned);
+sortedPosts = sortedPosts.filter(p => p.data.pinned == undefined);
+
+for (let pinnedPost of pinnedPosts)
+  sortedPosts.unshift(pinnedPost);
+
 const currentPosts = sortedPosts.slice(0, config.settings.pagination);
 ---
 

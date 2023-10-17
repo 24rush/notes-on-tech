@@ -1,23 +1,23 @@
 {
   "site": {
-    "title": "Bookworm Light Astro | Blog Template",
-    "base_url": "https://bookworm-light-astro.vercel.app",
+    "title": "Taking notes on tech | alinotes.com",
+    "base_url": "https://alincodes.vercel.app",
     "base_path": "/",
     "trailing_slash": false,
     "favicon": "/images/favicon.png",
-    "logo": "/images/logo.png",
+    "logo1": "/images/logo.png",
     "logo_width": "200",
     "logo_height": "34",
-    "logo_text": "Bookworm Light"
+    "logo_text": "alincodes.com"
   },
 
   "settings": {
-    "pagination": 5,
+    "pagination":10,
     "summary_length": 100
   },
 
   "metadata": {
-    "meta_author": "Themefisher",
+    "meta_author": "Alin Iordache",
     "meta_image": "/images/og-image.png",
     "meta_description": "Bookworm Light Astro Blog Template"
   },
@@ -28,8 +28,8 @@
   },
 
   "contactinfo": {
-    "address": "355 S Grand Ave <br/> Los Angeles, CA 90071",
+    "address": "Cluj-Napoca, Romania",
     "email": "info@bookworm.org",
-    "phone": "+800 567 1234"
+    "phone": ""
   }
 }

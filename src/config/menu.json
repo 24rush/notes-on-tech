@@ -1,61 +1,37 @@
 {
   "main": [
     {
-      "name": "Home",
+      "name": "Blog",
       "url": "/"
     },
     {
-      "name": "About",
+      "name": "About me",
       "url": "/about"
     },
     {
-      "name": "Contact",
-      "url": "/contact"
-    },
-    {
-      "name": "Pages",
+      "name": "My Projects",
       "url": "",
       "hasChildren": true,
-      "children": [
+      "children": [  
         {
-          "name": "Authors",
-          "url": "/authors"
-        },
-        {
-          "name": "Categories",
+          "name": "By areas",
           "url": "/categories"
         },
         {
-          "name": "Tags",
+          "name": "By tag",
           "url": "/tags"
-        },
-        {
-          "name": "Elements",
-          "url": "/elements"
-        },
-        {
-          "name": "Privacy Policy",
-          "url": "/privacy-policy"
-        }
+        }  
       ]
     }
   ],
   "footer": [
     {
+      "name": "Blog",
+      "url": "/"
+    },
+    {
       "name": "About",
       "url": "/about"
-    },
-    {
-      "name": "Contact",
-      "url": "/contact"
-    },
-    {
-      "name": "Elements",
-      "url": "/elements"
-    },
-    {
-      "name": "Privacy Policy",
-      "url": "/privacy-policy"
     }
   ]
 }

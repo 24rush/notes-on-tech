@@ -5,7 +5,7 @@ import { marked } from "marked";
 export const slugify = (content: string) => {
   if (!content) return null;
 
-  return slug(content);
+  return slug(content, true);
 };
 
 // markdownify

@@ -14,8 +14,8 @@ import {
   IoLogoFoursquare,
   IoLogoGithub,
   IoLogoGitlab,
-  IoLogoInstagram,
   IoLogoLinkedin,
+  IoLogoInstagram,
   IoLogoMastodon,
   IoLogoMedium,
   IoLogoPinterest,
@@ -39,9 +39,9 @@ const {
   facebook,
   twitter,
   mastodon,
+  linkedin,
   instagram,
   youtube,
-  linkedin,
   github,
   gitlab,
   discord,
@@ -114,6 +114,20 @@ const {
     )
   }
   {
+    linkedin && (
+      <li class="inline-block">
+        <a
+          aria-label="linkedin"
+          href={linkedin}
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+        >
+          <IoLogoLinkedin />
+        </a>
+      </li>
+    )
+  }
+  {
     instagram && (
       <li class="inline-block">
         <a
@@ -137,20 +151,6 @@ const {
           rel="noopener noreferrer nofollow"
         >
           <IoLogoYoutube />
-        </a>
-      </li>
-    )
-  }
-  {
-    linkedin && (
-      <li class="inline-block">
-        <a
-          aria-label="linkedin"
-          href={linkedin}
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-        >
-          <IoLogoLinkedin />
         </a>
       </li>
     )

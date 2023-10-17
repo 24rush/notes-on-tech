@@ -1,0 +1,55 @@
+---
+title: "I'm Alin, a C++ developer by trade but fullstack at heart"
+meta_title: "About"
+image: "/images/authors/profile_3_1.jpg"
+draft: false
+
+what_i_do:
+  title: "What I Do"
+  items:
+  - title: "Software development"
+    description: "I knew I wanted to be a programmer since careers in programming didn't even exist. I am driven by the passion for this domain and I almost never saw work as work - I saw it as fun."
+  
+  - title: "Youth mentoring"
+    description: "I help teenagers navigate the software development landscape and give them insights into what a career in tech might be."
+  
+  - title: "Informal leadership"
+    description: "I'm the person who keeps the team's spirits up and helps everyone work well together. I speak up when things aren't right."
+---
+import { FaHashtag } from "react-icons/fa/index.js";
+
+I can still recall the excitement I got after writing my first program as a little kid. I remember it vividly because it's the same thrill I get today after nearly **20 years** of coding. Writing code and seeing things work is a big _passion_ of mine which seems to be as strong as in day one for which I am truly grateful.
+
+For most of my career, I've worked in **C++** and on projects that are quite performance-hungry and mainly lower level but I did chart out of my comfort zone and became skilled in web technologies as well through my multiple personal side-projects.
+
+<h4>My tech stack</h4>
+<ul class="space-x-2" style="padding: 0; margin: 0;">
+  {
+    ["C/C++", "Rust", "Typescript", "Python", "Agile", "Software design"].map((tag) => (
+      <li class="inline-block">
+        <span
+          class="rounded-lg bg-theme-light px-2 py-2 text-dark transition hover:bg-primary hover:text-white flex items-center group"
+        >
+          <FaHashtag className="mr-1 text-primary group-hover:text-white transition" />
+          <>{tag}</>
+        </span>
+      </li>
+    ))
+  }
+</ul>
+
+<h4>My soft stack</h4>
+<ul class="space-x-2" style="padding: 0; margin: 0;">
+  {
+    ["Emotional Intelligence", "Leadership", "Youth mentoring"].map((tag) => (
+      <li class="inline-block">
+        <span
+          class="rounded-lg bg-theme-light px-2 py-2 text-dark transition hover:bg-primary hover:text-white flex items-center group"
+        >
+          <FaHashtag className="mr-1 text-primary group-hover:text-white transition" />
+          <>{tag}</>
+        </span>
+      </li>
+    ))
+  }
+</ul>
