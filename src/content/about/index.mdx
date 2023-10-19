@@ -5,16 +5,20 @@ image: "/images/authors/profile_3_1.jpg"
 draft: false
 
 what_i_do:
-  title: "What I Do"
+  title: "My strengths"
   items:
   - title: "Software development"
     description: "I knew I wanted to be a programmer since careers in programming didn't even exist. I am driven by the passion for this domain and I almost never saw work as work - I saw it as fun."
   
-  - title: "Youth mentoring"
-    description: "I help teenagers navigate the software development landscape and give them insights into what a career in tech might be."
-  
   - title: "Informal leadership"
     description: "I'm the person who keeps the team's spirits up and helps everyone work well together. I speak up when things aren't right."
+  
+  - title: "International etiquette"
+    description: "I've worked with people from around the world, from China to the US. I feel comfortable in multicultural environments and know how to tackle their subtleties."
+
+  - title: "Youth mentoring"
+    description: "I can connect easily with the younger generations and help them navigate the software development landscape giving them insights into what a career in tech might be."
+
 ---
 import { FaHashtag } from "react-icons/fa/index.js";
 
@@ -22,10 +26,10 @@ I can still recall the excitement I got after writing my first program as a litt
 
 For most of my career, I've worked in **C++** and on projects that are quite performance-hungry and mainly lower level but I did chart out of my comfort zone and became skilled in web technologies as well through my multiple personal side-projects.
 
-<h4>My tech stack</h4>
+<h4 class="h4 page-heading">My tech skills</h4>
 <ul class="space-x-2" style="padding: 0; margin: 0;">
   {
-    ["C/C++", "Rust", "Typescript", "Python", "Agile", "Software design"].map((tag) => (
+    ["C/C++", "Rust", "Typescript", "Python", "Agile", "Product Design", "Software Development"].map((tag) => (
       <li class="inline-block">
         <span
           class="rounded-lg bg-theme-light px-2 py-2 text-dark transition hover:bg-primary hover:text-white flex items-center group"
@@ -38,10 +42,10 @@ For most of my career, I've worked in **C++** and on projects that are quite per
   }
 </ul>
 
-<h4>My soft stack</h4>
+<h4 class="h4 page-heading">My soft skills</h4>
 <ul class="space-x-2" style="padding: 0; margin: 0;">
   {
-    ["Emotional Intelligence", "Leadership", "Youth mentoring"].map((tag) => (
+    ["Emotional Intelligence", "Leadership", "Resilience", "Youth mentoring"].map((tag) => (
       <li class="inline-block">
         <span
           class="rounded-lg bg-theme-light px-2 py-2 text-dark transition hover:bg-primary hover:text-white flex items-center group"
@@ -53,3 +57,18 @@ For most of my career, I've worked in **C++** and on projects that are quite per
     ))
   }
 </ul>
+
+<h4 class="h4 page-heading">Companies I've worked with:</h4>
+<div class="row justify-center text-center">
+{
+["https://upload.wikimedia.org/wikipedia/commons/6/6c/ASML_Holding_N.V._logo.svg",
+"https://cdn.freebiesupply.com/logos/large/2x/intel-1-logo-svg-vector.svg",
+"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Harman_International_logo.svg/2500px-Harman_International_logo.svg.png",
+"https://www.osadl.org/uploads/RTEmagicC_bmw-car-it-norm3.svg.svg",
+"https://geospatialmedia.s3.amazonaws.com/wp-content/uploads/2018/05/logo-telenav.png",
+"https://logowik.com/content/uploads/images/bitdefender-antivirus.jpg"].map((logo) => (
+  <img class="company_logo" src={logo}/>
+))
+}
+ 
+</div>

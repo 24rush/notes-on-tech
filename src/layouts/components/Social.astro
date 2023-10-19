@@ -127,6 +127,20 @@ const {
       </li>
     )
   }
+    {
+      github && (
+        <li class="inline-block">
+          <a
+            aria-label="github"
+            href={github}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+          >
+            <IoLogoGithub />
+          </a>
+        </li>
+      )
+    }
   {
     instagram && (
       <li class="inline-block">
@@ -151,20 +165,6 @@ const {
           rel="noopener noreferrer nofollow"
         >
           <IoLogoYoutube />
-        </a>
-      </li>
-    )
-  }
-  {
-    github && (
-      <li class="inline-block">
-        <a
-          aria-label="github"
-          href={github}
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-        >
-          <IoLogoGithub />
         </a>
       </li>
     )

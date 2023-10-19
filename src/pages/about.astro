@@ -1,16 +1,22 @@
 ---
 import config from "@config/config.json";
+import socials from "@config/social.json";
 
 import { Image } from "astro:assets";
 import Base from "@layouts/Base.astro";
 import { markdownify } from "@lib/utils/textConverter";
 import { getEntryBySlug } from "astro:content";
-import { FaAddressCard, FaEnvelope, FaPhoneAlt } from "react-icons/fa/index.js";
+import {
+  FaAddressCard,
+  FaEnvelope,  
+  FaGithubSquare,
+} from "react-icons/fa/index.js";
 
 const entry = await getEntryBySlug("about", "index");
 const { Content } = await entry.render();
 const { title, description, meta_title, image, what_i_do } = entry.data;
-const { address, email, phone } = config.contactinfo;
+const { address, phone } = config.contactinfo;
+const { github } = socials;
 ---
 
 <Base
@@ -54,25 +60,27 @@ const { address, email, phone } = config.contactinfo;
                   <FaEnvelope className="mr-3 text-primary" />
                   <p class="font-semibold">Email</p>
                 </div>
-                <p
-                  set:html={markdownify(email)}
-                  class="content mt-2 pl-8 leading-5"
-                />
+                <p class="content mt-2 pl-8 leading-5">
+                  <script type="text/javascript">
+                  user = "csie.aliniordache";
+                  site = "gmail.com";
+                  document.write(
+                    '<a href="mailto:' + user + "@" + site + '">'
+                  );
+                  document.write(user + "@" + site + "</a>");
+                  </script>
+                </p>
               </li>
-              {
-                phone ?? (
-                  <li>
-                    <div class="flex items-center text-xl text-theme-dark">
-                      <FaPhoneAlt className="mr-3 text-primary" />
-                      <p class="font-semibold">Phone</p>
-                    </div>
-                    <p
-                      set:html={markdownify(phone)}
-                      class="mt-2 pl-8 leading-5"
-                    />
-                  </li>
-                )
-              }
+
+              <li>
+                <div class="flex items-center text-xl text-theme-dark">
+                  <FaGithubSquare className="mr-3 text-primary" />
+                  <p class="font-semibold">Github</p>
+                </div>
+                <p class="content mt-2 pl-8 leading-5">
+                  <a href={github} style="text-decoration: underline;">{github}</a>
+                </p>
+              </li>
             </ul>
           </div>
         </div>

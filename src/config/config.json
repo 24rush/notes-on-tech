@@ -1,14 +1,14 @@
 {
   "site": {
-    "title": "Taking notes on tech | alinotes.com",
+    "title": "Exploring tech and writing about it | alincodes",
     "base_url": "https://alincodes.vercel.app",
     "base_path": "/",
     "trailing_slash": false,
-    "favicon": "/images/favicon.png",
+    "favicon": "/images/astro-icon_sm.png",
     "logo1": "/images/logo.png",
     "logo_width": "200",
     "logo_height": "34",
-    "logo_text": "alincodes.com"
+    "logo_text": "alincodes"
   },
 
   "settings": {
@@ -19,17 +19,17 @@
   "metadata": {
     "meta_author": "Alin Iordache",
     "meta_image": "/images/og-image.png",
-    "meta_description": "Bookworm Light Astro Blog Template"
+    "meta_description": "Writing about tech"
   },
 
   "params": {
     "contact_form_action": "#",
-    "copyright": "Copyright © 2023 a theme by [Themefisher](https://themefisher.com)"
+    "copyright": "Copyright© 2023 a theme by [Themefisher](https://themefisher.com) <br> proudly hosted on Vercel"
   },
 
   "contactinfo": {
     "address": "Cluj-Napoca, Romania",
-    "email": "info@bookworm.org",
+    "email": "",
     "phone": ""
   }
 }

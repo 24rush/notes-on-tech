@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets'
+import { Image } from "astro:assets";
 import config from "@config/config.json";
 const { src } = Astro.props;
 const {
@@ -31,7 +31,12 @@ const {
         }}
       />
     ) : logo_text ? (
-      <h2>{logo_text}</h2>
+      <div class="flex flex-col">
+        <h3 style="text-transform: uppercase;font-family: system-ui;font-size: 42px;">{logo_text}</h3>
+        <span style="font-size: 80%; margin-top: -7px;margin-left: 0px; ">
+          Exploring tech and writing about it
+        </span>
+      </div>
     ) : (
       title
     )
