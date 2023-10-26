@@ -22,7 +22,7 @@ const { title, description, slug, className } = Astro.props;
       <IoLogoFacebook />
     </a>
   </li>
-  <li class="inline-block">
+  <li style="display:none;" class="inline-block">
     <a
       aria-label="twitter share button"
       href={`https://twitter.com/intent/tweet/?text=${title}&amp;url=${base_url}/${slug}`}
@@ -42,7 +42,7 @@ const { title, description, slug, className } = Astro.props;
       <IoLogoLinkedin />
     </a>
   </li>
-  <li class="inline-block">
+  <li style="display:none;" class="inline-block">
     <a
       aria-label="pinterest share button"
       href={`https://pinterest.com/pin/create/button/?url=${base_url}/${slug}&media=&description=${description}`}
