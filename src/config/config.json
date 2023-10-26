@@ -1,14 +1,14 @@
 {
   "site": {
-    "title": "Exploring tech and writing about it | alincodes",
-    "base_url": "https://alincodes.vercel.app",
+    "title": "Exploring tech and writing about it | frugalcode",
+    "base_url": "https://frugalcode.vercel.app",
     "base_path": "/",
     "trailing_slash": false,
     "favicon": "/images/astro-icon_sm.png",
     "logo1": "/images/logo.png",
     "logo_width": "200",
     "logo_height": "34",
-    "logo_text": "alincodes"
+    "logo_text": "frugalcode"
   },
 
   "settings": {

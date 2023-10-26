@@ -92,5 +92,5 @@ For my usecase, Astro and Vercel have been amazing making my life so much easier
 
 If you want to see them in action, here are a few of my websites build with Astro: 
 - https://primiipasi.info (content is in Romanian)
-- this [blog](https://alincodes.vercel.app/) actually 
+- this [blog](https://frugalcode.vercel.app/) actually 
 - my [Strava mapping site](https://the-world-covered.vercel.app/).
