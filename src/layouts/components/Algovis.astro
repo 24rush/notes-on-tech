@@ -1,0 +1,46 @@
+---
+const { config_id, av_autoplay, av_selected, av_exercise, av_lazy } = Astro.props;
+
+const av_src_id = Math.random()
+    .toString(36)
+    .replace(/[^a-z]+/g, "")
+    .slice(2, 10);
+
+---
+{
+    (config_id || av_exercise || av_selected) && (
+        <div
+            class="algovis"
+            config-id={config_id}
+            av-selected={av_selected}
+            av-exercise={av_exercise}
+            av-autoplay={av_autoplay} 
+            av-lazy={av_lazy}
+        >
+            <slot />
+        </div>
+    )
+}
+
+{
+    !config_id && (
+        <div av-src-id={av_src_id}>
+            <slot />
+        </div>
+
+        <script is:inline>
+        addEventListener("load", () => {
+            for (let div of document.querySelectorAll("div[av-src-id]")) {
+                let div_mdx_content = div.textContent.trim();
+
+                if (!div_mdx_content) continue;
+
+                div.removeAttribute("av-src-id");
+                div.textContent = div_mdx_content;
+                div.classList.add("algovis");
+            }
+        });
+
+        </script>
+    )
+}

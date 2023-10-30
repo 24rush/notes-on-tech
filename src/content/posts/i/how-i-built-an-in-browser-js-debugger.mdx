@@ -1,0 +1,316 @@
+---
+title: "Thread Syncronization for Web Apps: How I Built An In Browser Javascript Debugger"
+description: "The story of how I built a Javascript in-browser debugger using Atomics and SharedArrayBuffer"
+short_desc: "The story of how I built a Javascript in-browser debugger using Atomics and SharedArrayBuffer"
+date: 2023-10-28T05:00:00Z
+image: "/images/posts/64805520-087e-4a6e-b13e-905af80019d2.png"
+categories: ["Programming"]
+authors: ["Alin"]
+tags: ["Typescript", "Debugging", "primiipasi.info"]
+draft: false
+---
+
+import Algovis from '../../../layouts/components/Algovis.astro'
+
+Before I get started, let me show you what I will be talking about in this article. 
+
+↘️ Click _Execute line_ to get started ↙️
+<Algovis>
+```js
+ function generatePassword(length) {
+  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+  let password = "";
+  
+  for (let i = 0; i < length; i++) {
+      const rndIndex = Math.floor(Math.random() * charset.length);
+      password += charset[rndIndex];
+  }
+
+  return password;
+}
+  
+const passLength = 8;
+const randomPassword = generatePassword(passLength);
+
+console.log(`Random Password: ${randomPassword}`);
+```
+</Algovis>
+
+What you just played with is a widget that sits at the core of [primiipasi.info](https://primiipasi.info) and is a niftly little Javascript "debugger" meant to help kids visualize how code...runs. The idea was to give them something to interact with so they can see how their code actually executes and how data is changed at runtime.
+
+## The requirements
+This would not be a full blown debugger but a widget that could:
+- _step through code_ line by line
+- show _values of variables_ and signal visually when they get updated
+- show the variables' _scopes_ during execution
+
+## The challenges
+The first challenge was to figure out how to parse the code so I could _track the variables/functions_ being updated/called. For this I wanted to be able to inject myself in different areas of the code so I could basically know what was going on in the script. [Esprima](https://esprima.org/index.html) to the rescue.
+
+Secondly, a webpage is meant to be _single threaded_ consisting of only the main (UI) thread. Creating a debugger that would pause the execution of a script would definitely not work in a single threaded enviroment but [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) were created just for this so another issue out the way.
+
+Even if the code would now be running in a separate thread from the UI's, I still needed to be able to pause/start its execution to create the step-over behaviour of a debugger. For this, one would need a _thread synchronization_ mechanism which in Javascript can be achieved using [SharedArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer) -- which proved to be a can of worms that I will talk about later.
+
+## General architecture
+![](/images/posts/38a28092-71a9-437e-94f1-555470daf405.png)
+
+What is obvious from the diagram is that the app runs within two threads: 
+- the _UI thread_ containing the interface and handling the user interaction
+- the _worker thread_ handling the processing and execution of the debugged code
+
+A brief explanation of the main boxes:
+- ```WidgetUI``` contains everything related to the UI of the widget (obviously!) meaning the [Ace Editor](https://ace.c9.io/) through which the source code enters the app, all the UI elements for the user to interact with the debugger, the HTML templates for displaying variables, functions, scopes, etc.
+- ```CodeProcessor``` is the class responsible for tokenizing the code using [esprima](https://esprima.org/index.html) and generating the cookied code (the one containing the cookie functions responsible for determining the state of the program)
+- ```CodeExecutor``` is the class that handles the execution of the cookied code in a separate thread and handles the communication with the main thread via the cookied functions
+- ```CodeExecutorProxy``` is just a wrapper over the ```CodeExecutor``` which is meant to be used from the main thread to communicate with it
+- ```CodeDebugger``` is an orchestrator of all the messages/event going from the UI to the worker thread and vice versa
+- ```NotificationBus``` is a pub/sub layer that facilitates the propagation of events from the worker thread (setting variables, calling functions, etc.) to the UI
+
+## Code processing with Esprima
+As mentioned earlier, I've used *esprima* to tokenize the code and what it does is to return a very nice tree structure containing all the elements of the script alongside their positions in the source code.
+
+Let's take this script, for example:
+![](/images/posts/2e9f30b8-5f5e-427a-afa9-fc64a1edc48a.png)
+
+The program is returned as an array of esprima objects coresponding to each code construct it encountered. Every array position could also contain other arrays for the nested sub-constructs therefore you would get a tree. 
+
+The information provided by esprima is verbose but what I would generally be interested in is the type of construct, the name of the element being acted on (variable name, function call, etc.) and the index position in the source code.
+
+### Cookies 🍪
+Knowing the code constructs and their source code positions, the next step was to figure out which ones are interesting to me considering the requirements I have (to track the variable assignments, function call, scopes, etc.) and _inject specifically taylored functions (cookies)_ for each that will act as notifiers when the code reaches their execution.
+
+Using the code snippet above, let's take line ```6``` as an example. 
+
+![](/images/posts/d9c5a839-6fa8-411d-b50d-441a670f9382.png)
+
+The ```let x = 1;``` variable declaration and initialization is represented by esprima with an object of type ```VariableDeclarator``` and alongside it's properties, it also contains the ```range``` field with the position in the source code, from index ```52 to 62```. I would now know that between these positions in the source code there is an assignment happening.
+
+If traversing this tree and encountering such a ```VariableDeclarator``` object, I would pick the variable's name and its corresponding index in the source code and store it in a separate structure which at the end of the traversal would help me place a cookie in the form of this function ```setVar('x', x)```.
+
+In the 'cookied code' the ```let x = 1;``` declaration would be transformed into:
+![](/images/posts/af20f52d-563f-4975-8241-ba543afcd5cf.png)
+(the ```markcl()``` cookie is added manually before every new line)
+
+Similarly, for ```FunctionDeclaration``` or ```BlockStatement``` objects, I would process them and generate cookies in the form of ```startScope(<scopeName>)``` which would signal that a new scope was about to start.
+
+Here are some of these cookie functions and their use:
+- ```setVar(varName, varValue)``` signals that a variable assignement is taking place
+- ```start/endScope(scopeName)``` signals that a new scope has either started or ended
+- ```marckl(lineNo)``` marks a new line, it's the function that basically halts the execution until the user clicks advance
+- ```funcWrap(...)``` wrapper function over all function calls
+
+With this said, the initial code after injecting the cookies became:
+```ts
+;markcl(1); ;startScope('global');function boo() {
+;markcl(2);  let x = 5;;setVar('x', x);
+;markcl(3);  x = 6;;setVar('x', x);
+}
+  
+;markcl(6);   let x = 1;;setVar('x', x);
+;markcl(7);   console.log(x);
+  
+;markcl(9);   funcWrap( {f: () => { pushParams([]); startScope('!boo'); let ret = boo(); popParams([]); endScope('!boo');; return ret;}} );
+;markcl(10); ;endScope('global');;
+```
+
+This sounds straightforward but a lot of heavy lifting was required to figure out what and where to inject each cookie. The code can be seen here ▶️ [src/code-processor.ts](https://github.com/24rush/algo-vis/blob/develop/src/code-processor.ts)
+
+## Code execution
+Executing the code involved passing the processed source code from the main thread to the worker and then sending the command to execute it.
+
+### The handshake step
+This step involved sending three pieces of information:
+- the processed source code
+- a reference to the shared memory (SharedArrayBuffer) to later by used for synchronization between the UI thread and the worker
+- the 'execute' signal to start executing the code
+
+For passing messages to a spawned worker thread, the [Worker::postMessage](https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage) function was used as follows:
+
+The ```CodeExecutorProxy``` calls the ```Worker.postMessage```:
+```js
+this.worker.postMessage({
+    cmd: cmd, // message type
+    params: args // message payload
+});
+```
+
+on the other side (in the worker thread), the receiving ```CodeExecutor``` class receives it through the [```self.onmessage```](https://developer.mozilla.org/en-US/docs/Web/API/DedicatedWorkerGlobalScope/message_event) callback:
+```js
+self.onmessage = (event) => {              
+    switch (event.data.cmd) {            
+        case CodeExecutorCommands.sharedMem:
+            codex.setSharedMem(event.data.params[0]);
+            break;
+        case CodeExecutorCommands.setSourceCode:
+            codex.setSourceCode(event.data.params[0]);
+            break;
+        case CodeExecutorCommands.execute:
+            codex.execute();
+            break;
+
+        default:
+            throw 'Cant handle cmd code ' + event.data.cmd;
+    }
+};
+```
+
+In the ```CodeDebugger``` class the complete handshake step is implemented as follows:
+```js
+this.codeExecProxy.init(); // send shared memory reference
+this.codeExecProxy.setSourceCode(this.codeProcessor.getCode()); // pass the source code
+this.codeExecProxy.execute(); // trigger the execution
+```
+
+and because _postMessage_(s) are just events in the queue of the worker thread that were send from the main thread, they will also be processed in the same order in the worker thread.
+
+## Stepping over in code
+The whole point of the widget was to offer the possibilty to execute the code _line by line_ so users can see how each code line affects the state of the program.
+
+The way this was implemented was using a blocking cookie function (```markcl``` more precisely) that would halt the execution of the script/thread until it got the signal to proceed from the user/main thread. This synchronization mechanims is hanled in Javascript by [Atomics](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics) and [SharedArrayBuffers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer).
+
+All this would have not been possible without the ```Atomics.wait``` function which uses a _SharedArrayBuffer_ to verify if an index position from that buffer is of a certain value and if so it sleeps until either a wake-up notification is received or a time-out.
+
+### The synchronization mechanism:
+
+Let's take this 2 line example:
+![](/images/posts/1490d50b-c3c5-4292-95f1-8af7501fdc0a.png)
+
+1. Lines ```6-7``` after processing are translated into the cookied code on the right side (what ```eval``` receives)
+2. Code is _eval-ed_ and execution reaches ```markcl(6);``` with the following implementation:
+    ```js
+    markcl(lineNumber: number) {
+        let codex = codeExec(); //this
+
+        // Send message back to UI to signal what the current line is
+        self.postMessage({
+            cmd: CodeExecutorCommands.markcl,
+            params: Array.from([lineNumber])
+        });
+
+        // Block myself and wait for Proceed signal from user
+        Atomics.store(codex.advanceFlag, 
+                        CodeExecutorSlots.Main, CodeExecutorMessages.Wait);
+
+        // Sleep as long as position CodeExecutorSlots.Main (0) of SharedArrayBuffer is = Wait
+        let status = Atomics.wait(codex.advanceFlag, 
+                                CodeExecutorSlots.Main, CodeExecutorMessages.Wait);
+
+        // When wake up is received verify if value in CodeExecutorSlots.Aux (1) slot is stop signal (Stop)
+        // therefore the wakeup was for Stopping and not Proceed
+        if (status == 'ok') {
+            let auxFlag: number = Atomics.load(codex.advanceFlag, CodeExecutorSlots.Aux);
+
+            if (auxFlag == CodeExecutorMessages.Stop) {
+                throw "__STOP__";
+            }
+        }
+
+        // if Aux slot value is not Stop then allow execution to move forward
+    }
+    ```
+
+    What is happening:
+    - a message is sent back to UI thread notifying what the current code line is so it can place the highlighted line in the code editor
+    - ```Atomics.store(sharedMem, 0, Wait)``` is called placing value ```Wait``` at index 0 of the shared memory. 
+    - ```Atomics.wait(sharedMem, 0, Wait)``` is called signifying that the current worker thread will sleep as long as value Wait will be stored at position 0 in the shread memory - _it basically blocks itself_
+
+    At this point, the worker thread (debugged code) is stopped in the ```markcl(6)``` function call and what the user sees is something like this:
+    ![](/images/posts/10b4a88b-425a-4b61-8fb3-a845040b903d.png)
+
+3. When the user clicks 'Execute line' the following implementation is executed:
+    ```js
+    executeLine() {        
+        // Wakeup the debugged code from the worker thread
+        Atomics.notify(this.advanceFlag, CodeExecutorSlots.Main);
+    }    
+    ```
+4. The ```Atomics.notify``` call will wake up the debugger code (unblock the ```Atomics.wait``` function) which will resume execution.
+5. Execution moved forward with the code below:
+    ```js
+      let x = 1;;setVar('x', x);
+      markcl(7);
+   ``` 
+   and what the user now sees is:
+    ![](/images/posts/44aa8951-0ab9-4e78-b3f1-b7723d14756d.png)
+    - notice that line ```7``` is now highlighted and variable ```x``` was created with value ```1```
+
+
+## Updating the UI
+Whenever one of the cookie functions gets executed, a message is send back to the main thread and some processing is done to figure out what happened after which a message is re-sent to update the UI in a particular way.
+
+![](/images/posts/bc640bc0-eaf1-47f9-8a31-8d42b6d1f715.png)
+
+Let's take for example the creation of a new scope. 
+
+1. The ```startScope(<scopeName>)``` cookie function is executed in the worker thread which sends a message to the parent thread (main thread):
+
+    ```js
+    startScope(scopeName: string) {
+        self.postMessage({
+            cmd: CodeExecutorCommands.startScope,
+            params: Array.from(arguments)
+        });
+    }
+    ```
+
+2. The main thread puts it on the ```NotificationBus```:
+    ```js
+    this.worker.onmessage = (event) => {
+            let params = event.data.params;
+
+            switch (event.data.cmd) {
+                ...
+                case CodeExecutorCommands.startScope:
+                    this.notificationBus.startScope(params[0]);
+                    break;
+            }
+    }
+    ```
+
+    and the ```NotificationBus``` calls all subscribers to the ```startScope``` message:
+    ```js
+    startScope(scopeName: string) {
+        for (const notifier of this.notificationObservers) {
+            if ('startScope' in notifier)
+                notifier.startScope(scopeName);
+        }
+    }
+    ```
+
+3. The only subscriber for this message is the ```CodeDebugger``` class which processes the message (the ```Magic``` box) and delivers its counterpart to the UI:
+    ```js
+    startScope(scopeName: string) {
+        // Update internal state
+        this.scopeMonitor.scopeStart(scopeName);
+
+        // Send the processed message to the UI
+        this.notificationBus.onEnterScopeVariable(scopeName);
+    }
+    ```
+
+4. This message is then received by the widget's UI and handled in the form of generating a HTML fragment for the new scope and placing it in the corresponding location in the DOM:
+
+    An oversimplified version:
+    ```js
+    onEnterScopeVariable(scopeName: string) {
+        // Generate HTML string from template
+        let rendered = MustacheIt.render(this.scopeTemplateHTML, 
+                                        { 
+                                            scopeName: scopeName, 
+                                            scope_idx: Scopes.scope_idx++ 
+                                        });
+
+        // Create HTMLElement from string template
+        let scopeHtmlElement = DOMmanipulator.fromTemplate(rendered);
+
+        // Add it to the DOM
+        this.scene.append(scopeHtmlElement);
+    }
+    ```
+
+### The ```Magic``` box
+As you can imagine, tracking all variables and function calls in a program is not an easy task and in the diagram I've placed all this logic in the ```Magic``` box. In a nutshell, what happens inside is:
+- keep track of all started/ended scopes
+- keep track of active variables and their scope (identifying the scope of a variable was the most challenging part as the only information I would get from the cookies was that a variable with a name was set a certain value and then I would need to figure out to the variable in which scope it was referring to)
+
+The code for the Magic box can be found ▶️ src/
