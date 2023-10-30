@@ -10,7 +10,7 @@
         ]
       },
       {
-        "source": "310.bundle.js",
+        "source": "/^\\/assets\\/scripts\\/310\\.bundle\\.js$/i",
         "headers": [
           { "key": "Access-Control-Allow-Credentials", "value": "true" },
           { "key": "Access-Control-Allow-Origin", "value": "*" },
