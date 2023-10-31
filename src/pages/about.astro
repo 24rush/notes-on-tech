@@ -10,13 +10,14 @@ import {
   FaAddressCard,
   FaEnvelope,  
   FaGithubSquare,
+  FaLinkedin
 } from "react-icons/fa/index.js";
 
 const entry = await getEntryBySlug("about", "index");
 const { Content } = await entry.render();
 const { title, description, meta_title, image, what_i_do } = entry.data;
 const { address, phone } = config.contactinfo;
-const { github } = socials;
+const { github, linkedin } = socials;
 ---
 
 <Base
@@ -81,6 +82,17 @@ const { github } = socials;
                   <a href={github} style="text-decoration: underline;">{github}</a>
                 </p>
               </li>
+
+              <li>
+                <div class="flex items-center text-xl text-theme-dark">
+                  <FaLinkedin className="mr-3 text-primary" />
+                  <p class="font-semibold">Linkedin</p>
+                </div>
+                <p class="content mt-2 pl-8 leading-5">
+                  <a href={linkedin} style="text-decoration: underline;">{linkedin}</a>
+                </p>
+              </li>
+
             </ul>
           </div>
         </div>
