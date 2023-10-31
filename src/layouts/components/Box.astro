@@ -1,0 +1,88 @@
+---
+let { attention, knowledge, info } = Astro.props;
+---
+
+{
+    attention && (
+        <div class="attn-box">          
+            <slot />
+        </div>
+    )
+}
+
+{
+    knowledge && (
+        <div class="know-box">           
+            <slot />
+        </div>
+    )
+}
+
+{
+    info && (
+        <div class="inf-box">            
+            <slot />
+        </div>
+    )
+}
+
+<style scoped>
+    :root {
+        --attention-color: #FF4949;
+        --know-color: #38E54D;
+        --tip-color: #0079ff;
+        --box-margin: 2rem 0rem 1rem 1rem;
+
+        --border-width: 4px;
+    }
+
+    .box-pill {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        transform: translate(calc(-55%), -55%);
+        padding: 6px;
+        /*background-color: rgb(241 245 249 / var(--tw-bg-opacity));*/
+        background-color: white;
+        border-radius: 50%;
+    }
+
+    .attention-pill {
+        color: var(--attention-color);
+    }
+
+    .know-pill {
+        color: var(--know-color);
+    }
+
+    .tip-pill {
+        color: var(--tip-color);
+    }
+
+    .attn-box {
+        position: relative;
+        background: #ffdd0012;
+        --box-content-color: var(--attention-color);
+        border-color: var(--attention-color) !important;
+        padding: 10px 20px;        
+        border-left: var(--border-width) solid;
+    }
+
+    .know-box {
+        position: relative;
+        background: #00cc880f;
+        --box-content-color: var(--know-color);
+        border-color: var(--know-color) !important;
+        padding: 10px 20px;
+        border-left: var(--border-width) solid;        
+    }
+
+    .inf-box {
+        position: relative;
+        background: #eaf8ffa3;
+        --box-content-color: var(--tip-color);
+        border-color: var(--tip-color) !important;
+        padding: 10px 20px;
+        border-left: var(--border-width) solid;
+    }
+</style>

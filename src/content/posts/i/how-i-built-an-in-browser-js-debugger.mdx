@@ -10,6 +10,7 @@ tags: ["Typescript", "Debugging", "primiipasi.info"]
 draft: false
 ---
 import Algovis from '../../../layouts/components/Algovis.astro'
+import Box from '../../../layouts/components/Box.astro'
 
 Before I get going, let me show you what I will be talking about in this article. 
 
@@ -37,14 +38,16 @@ console.log(`Random Password: ${randomPassword}`);
 
 What you just played with is a widget that sits at the core of [primiipasi.info](https://primiipasi.info) and is a niftly little Javascript "debugger" meant to help kids/beginners visualize how code...runs. The idea was to give them something to interact with so they could see how their code actually executes and how data is changed at runtime.
 
-## The requirements
+<Box knowledge>
+## Requirements
 This would not be a full-blown debugger but a widget that could:
 - _step through Javascript code_ line by line
 - show _values of variables_ and visually signal when they get updated
 - show the variables' _scopes_ during execution
-- assist in learning more complex programming topics like bitwise operations, recursion, graph types, etc.
+- assist in learning more complex programming topics like _bitwise operations, recursion, graph types, etc._
+</Box>
 
-## The challenges
+## Challenges
 The first one was to figure out how to parse the code so I could _track the variables/functions_ being updated/called. For this, I wanted to be able to inject myself into different areas of the code so I could know what was going on in the script. [Esprima](https://esprima.org/index.html) to the rescue.
 
 Secondly, a webpage is meant to be _single threaded_ consisting of only the main (UI) thread. Creating a debugger that would pause the execution of a script would definitely not work in a single threaded enviroment but [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) were created just for this, so another issue out the way.
@@ -115,7 +118,7 @@ With this said, the initial code after injecting the cookies becomes:
 
 This sounds straightforward but a lot of heavy lifting was required to figure out what and where to inject each cookie. 
 
-The complete source code can be found here ▶️ [src/code-processor.ts](https://github.com/24rush/algo-vis/blob/develop/src/execution/code-processor.ts)
+> The complete source code can be found here ▶️ [src/code-processor.ts](https://github.com/24rush/algo-vis/blob/develop/src/execution/code-processor.ts)
 
 ## Code execution
 Executing the code involved passing the processed source code from the main thread to the worker and then sending the command to execute it, all orchestrated by a handshake step.
@@ -168,7 +171,7 @@ this.sendWorkerMessage(CodeExecutorCommands.execute); // trigger the execution
 
 and because _postMessage_(s) are just events in the queue of the worker thread that were sent from the main thread, they will also be processed in the same order in the worker thread as the one made in the main thread.
 
-The complete source code can be found here ▶️ [src/code-executor-proxy.ts](https://github.com/24rush/algo-vis/blob/develop/src/execution/code-executor-proxy.ts)
+> The complete source code can be found here ▶️ [src/code-executor-proxy.ts](https://github.com/24rush/algo-vis/blob/develop/src/execution/code-executor-proxy.ts)
 
 ## Stepping over in code
 The whole point of the widget was to offer the possibility to execute the code _line by line_ so users can see how each code line affects the state of the program.
@@ -242,7 +245,9 @@ Let's take these 2 lines as an example:
     - notice that line ```7``` is now highlighted and variable ```x``` was created with value ```1```
 
 ### Implications of using ```SharedArrayBuffer``` 🪱
+<Box attention>
 ```SharedArrayBuffers``` and _high performance counters_ are two browser features that require special security requirements as they were used in the past in attacks like Spectre. 
+</Box>
 
 For this reason, when using one of these features, your website needs to opt-in for _cross-origin isolation_ which means that resources that use these features need to be vetted by the owning server and will be guaranteed to never share a browsing context group with an evil actor. You can see it as a way of being able to _isolate these powerful features to pages that you own_ and have the browser guarantee that they will never be mixed with external resources that might take advantage of them.
 
@@ -286,7 +291,7 @@ Below, you can see my ```vercel.json``` for this solution:
 ```
 ...now let's circle back to the widget.
 
-## The user interface 
+## User interface 
 Whenever one of the cookie functions gets executed, a message is sent back to the main thread to figure out what happened, after which a new message is sent to update the UI in correspondence with that event.
 
 ![](/images/posts/bc640bc0-eaf1-47f9-8a31-8d42b6d1f715.png)
@@ -348,7 +353,6 @@ Let's take for example the creation of a new scope.
         let rendered = MustacheIt.render(this.scopeTemplateHTML, 
                                         { 
                                             scopeName: scopeName, 
-                                            scope_idx: Scopes.scope_idx++ 
                                         });
 
         // Create HTMLElement from string template
@@ -358,7 +362,7 @@ Let's take for example the creation of a new scope.
         this.scene.append(scopeHtmlElement);
     }
     ```
-    and the result will be that the UI will now display a new scope, in this example the empty _GLOBAL SCOPE_
+    and the result will be that the UI will now display a new scope, in this example the empty **GLOBAL SCOPE**
     ![](http://localhost:4321/images/posts/10b4a88b-425a-4b61-8fb3-a845040b903d.png)
 
 ### The ```Magic``` box
@@ -366,7 +370,7 @@ As you can imagine, tracking all variables and function calls in a program is no
 - keep track of all started/ended scopes
 - keep track of active variables and their scope (identifying the scope of a variable was the most challenging part as the only information I would get from the cookies was that a variable with a name was set a certain value and then I would need to figure out to _which variable from which scope_ it was referring to)
 
-The code for the Magic box can be found ▶️ [src/code-debugger.ts](https://github.com/24rush/algo-vis/blob/develop/src/execution/code-debugger.ts)
+> The code for the Magic box can be found ▶️ [src/code-debugger.ts](https://github.com/24rush/algo-vis/blob/develop/src/execution/code-debugger.ts)
 
 ## Advanced features
 Besides the feature of stepping through Javascript code, the widget is also capable in helping understand some more complex programming topics like: _bitwise operations, references, recursion, graph data types_ and more.
