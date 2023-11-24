@@ -141,13 +141,14 @@ const av_version = 12;
       }`}
     />
     <meta name="twitter:card" content="summary_large_image" />
+
   </head>
   <body>
     <TwSizeIndicator />
     <Header />
-    <main id="main-content" class="min-h-[60vh]">
+    <div id="main-content" class="min-h-[60vh]">
       <slot />
-    </main>
+    </div>
     <Footer />    
     {
       includeAv && (    
@@ -163,7 +164,7 @@ const av_version = 12;
 
         <script src={"./../assets/scripts/bundle-" + av_version + ".js"} type="text/javascript" is:inline></script>    
 
-        <link href="../assets/styles/bootstrap.css" rel="stylesheet"/>          
+        <link href="../assets/styles/bootstrap.min.css" rel="stylesheet"/>          
         <link href="../assets/styles/av-wp-styles.css" rel="stylesheet"/>          
         <link href="../assets/styles/av-styles.css" rel="stylesheet"/>   
       )

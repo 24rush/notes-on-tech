@@ -1,6 +1,6 @@
 {
   "site": {
-    "title": "Exploring tech and writing about it | frugalcode",
+    "title": "Exploring tech and taking notes about it | frugalcode",
     "base_url": "https://frugalcode.vercel.app",
     "base_path": "/",
     "trailing_slash": false,
@@ -12,14 +12,14 @@
   },
 
   "settings": {
-    "pagination":10,
+    "pagination":11,
     "summary_length": 100
   },
 
   "metadata": {
     "meta_author": "Alin Iordache",
     "meta_image": "/images/og-image.png",
-    "meta_description": "Writing about tech"
+    "meta_description": "Exploring tech and taking notes about it | frugalcode"
   },
 
   "params": {

@@ -5,16 +5,12 @@
       "url": "/"
     },
     {
-      "name": "About me",
-      "url": "/about"
-    },
-    {
-      "name": "My Projects",
+      "name": "Articles",
       "url": "",
       "hasChildren": true,
       "children": [  
         {
-          "name": "By areas",
+          "name": "By area",
           "url": "/categories"
         },
         {
@@ -22,6 +18,10 @@
           "url": "/tags"
         }  
       ]
+    },
+    {
+      "name": "About me",
+      "url": "/about"
     }
   ],
   "footer": [

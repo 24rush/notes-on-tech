@@ -1,12 +1,14 @@
 ---
-import { Image } from 'astro:assets'
+import { Image } from "astro:assets";
 import Share from "@components/Share.astro";
 import SimilarPosts from "@components/SimilarPosts.astro";
+import RightSidebar from "@components/RightSidebar.astro";
+
 import { getSinglePage } from "@lib/contentParser.astro";
 import dateFormat from "@lib/utils/dateFormat";
 import similerItems from "@lib/utils/similarItems";
-import { humanize,markdownify,slugify } from "@lib/utils/textConverter";
-import { BiCalendarEdit,BiCategoryAlt } from "react-icons/bi/index.js";
+import { humanize, markdownify, slugify } from "@lib/utils/textConverter";
+import { BiCalendarEdit, BiCategoryAlt } from "react-icons/bi/index.js";
 
 const allAuthors = await getSinglePage("authors");
 const posts = await getSinglePage("posts");
@@ -16,11 +18,12 @@ const { Content } = await post.render();
 const { title, description, authors, categories, image, date, tags } =
   post.data;
 ---
-
-<section class="section">
-  <div class="container">
-    <article class="row justify-center">
-      <div class="md:col-10 text-center">
+<div class="main-responsive">
+<div class="sticky top-0 h-screen flex white-background"></div>
+<main>
+  <article class="">
+    <section class="container section justify-center">
+      <div class="text-center md:col-12">
         <h1 set:html={markdownify(title)} class="h2" />
         <ul class="mt-4 flex flex-wrap items-center justify-center text-text">
           <li class="mx-3">
@@ -34,7 +37,7 @@ const { title, description, authors, categories, image, date, tags } =
                 .map((author, i) => (
                   <a
                     href={`/authors/${slugify(author.slug)}`}
-                    class="flex items-center hover:text-primary font-medium"
+                    class="flex items-center font-medium hover:text-primary"
                   >
                     {author.data.image && (
                       <Image
@@ -50,56 +53,59 @@ const { title, description, authors, categories, image, date, tags } =
                 ))
             }
           </li>
-          <li class="mx-3 flex items-center flex-wrap font-medium">
+          <li class="mx-3 flex flex-wrap items-center font-medium">
             <BiCalendarEdit className="mr-1 h-5 w-5 text-gray-600" />
             <>{dateFormat(date)}</>
           </li>
-          <li class="mx-3 flex items-center flex-wrap">
+          <li class="mx-3 flex flex-wrap items-center">
             <BiCategoryAlt className="mr-1 h-[18px] w-[18px] text-gray-600" />
             <>
-            <ul>
-              {
-                categories.map((category: string, i: number) => (
-                  <li class="inline-block">
-                    <a
-                      href={`/categories/${slugify(category)}`}
-                      class="mr-2 hover:text-primary font-medium"
-                    >
-                      {humanize(category)}{i !== post.data.categories.length - 1 && ","}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
+              <ul>
+                {
+                  categories.map((category: string, i: number) => (
+                    <li class="inline-block">
+                      <a
+                        href={`/categories/${slugify(category)}`}
+                        class="mr-2 font-medium hover:text-primary"
+                      >
+                        {humanize(category)}
+                        {i !== post.data.categories.length - 1 && ","}
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
             </>
           </li>
         </ul>
       </div>
 
-      <div class="col-12 mt-8 mb-2">
-        {image && (
-          <Image
-            src={image}
-            height={500}
-            width={1000}
-            alt={title}
-            class="rounded-lg"
-          />
-        )}
+      <div class="col-10 mb-2 mt-8" style="margin-left: auto; margin-right: auto;">
+        {
+          image && (
+            <Image
+              src={image}
+              height={500}
+              width={1000}
+              alt={title}
+              class="rounded-lg"
+            />
+          )
+        }
       </div>
 
-      <div class="md:col-10">
+      <div class="md:col-12">
         <div class="content mb-16 text-left">
           <Content />
         </div>
         <div class="flex flex-wrap items-center justify-between">
-          <ul class="mr-4 mb-4 space-x-3">
+          <ul class="mb-4 mr-4 space-x-3">
             {
               tags.map((tag: string) => (
                 <li class="inline-block">
                   <a
                     href={`/tags/${slugify(tag)}`}
-                    class="block rounded-lg bg-theme-light px-4 py-2 font-semibold text-dark text-sm hover:text-primary transition duration-300"
+                    class="block rounded-lg bg-theme-light px-4 py-2 text-sm font-semibold text-dark transition duration-300 hover:text-primary"
                   >
                     #{humanize(tag)}
                   </a>
@@ -115,18 +121,58 @@ const { title, description, authors, categories, image, date, tags } =
           />
         </div>
       </div>
-    </article>
-  </div>
-</section>
+    </section>   
+  </article>
+   <!-- similar posts -->
+   {
+    similarPosts.length > 0 && (
+      <section class="section pt-0">
+        <div class="container">
+          <h2 class="h3 mb-8 text-center">Similar Posts</h2>
+          <SimilarPosts posts={similarPosts.slice(0, 3)} />
+        </div>
+      </section>
+    )
+  }
 
-<!-- similar posts -->
-{
-  similarPosts.length > 0 && (
-    <section class="section pt-0">
-      <div class="container">
-        <h2 class="mb-8 text-center h3">Similar Posts</h2>
-        <SimilarPosts posts={similarPosts.slice(0, 3)} />
-      </div>
-    </section>
-  )
-}
+</main>
+
+<div class="right-sidebar sticky top-0 flex h-screen">
+  <RightSidebar />
+</div>
+
+</div>
+
+<style scoped>
+  .white-background {
+    background-color: white;
+  }
+
+  .main-responsive {   
+    display: grid;
+    grid-template-columns: 10% 75% 15%;
+  }
+
+  .right-sidebar {
+    min-width: 20%;
+  }
+
+  @media (max-width: 1200.98px) {
+    .main-responsive {   
+      display: grid;
+      grid-template-columns: 0% 80% 20%;
+    }
+  }
+
+  @media (max-width: 968px) {
+    .main-responsive {
+      display: grid;
+      grid-template-columns: 0% 100% 0%;
+    }
+
+    .right-sidebar {
+      display: none !important;
+    }
+  }
+
+</style>

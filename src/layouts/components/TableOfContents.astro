@@ -1,0 +1,100 @@
+---
+---
+
+<ul class="toc-container toc mb-4 flex flex-col gap-1" style="font-size: 80%; padding-right: 1em;">
+</ul>
+
+<script is:inline>
+  if (!String.format) {
+    String.format = function (format) {
+      var args = Array.prototype.slice.call(arguments, 1);
+      return format.replace(/{(\d+)}/g, function (match, number) {
+        return typeof args[number] != "undefined" ? args[number] : match;
+      });
+    };
+  }
+
+  let toc = document.querySelector(".toc");
+
+  if (toc) {
+    let createElementFromTemplate = (templateStr) => {
+      let templateElement = document.createElement("div");
+      templateElement.innerHTML = templateStr.trim();
+
+      return templateElement.firstChild;
+    };
+
+    let hasHeadings = false;
+    // Find all headings and add toc-id instead of id
+    for (let headingNo = 2; headingNo <= 6; headingNo++) {
+      let headings = document.querySelectorAll(
+        "article h" + headingNo.toString()
+      );
+
+      for (heading of headings) {     
+        hasHeadings = true;
+        heading.setAttribute("toc-id", heading.id);
+      }
+    }
+
+    if (hasHeadings) {
+      let templateStr = `<span style="font-weight: 600;" class="text-slate-600">Content:</span>`;
+      toc.parentElement.insertBefore(
+        createElementFromTemplate(templateStr),
+        toc
+      );
+    }
+
+    // Iterate over all headings and generate entries in order of appeareance    
+    let headings = document.querySelectorAll("[toc-id]");
+
+    for (let heading of headings) {
+      let offset = parseInt(heading.tagName.toLowerCase().replace("h", ""));
+      let paddingRem = 0.5 * (offset - 1);
+
+      let templateStr = String.format(
+        `<li class="text-slate-400 hover:text-slate-800 hover:text-slate-900" style="padding-left: {0}rem;"><a href=#{1}>{2}</a ></li>`,
+        paddingRem,
+        heading.id,
+        heading.textContent
+      );
+
+      toc.append(createElementFromTemplate(templateStr));
+    }
+
+    let options = {
+      rootMargin: "0px",
+      threshold: 1.0,
+    };
+
+    let visibilityCache = {};
+
+    let observer = new IntersectionObserver((entries) => {
+      let updHighlightEntry = (targetId, highlight) => {
+        let tocElement = document.querySelector('a[href="#' + targetId + '"]');
+        if (highlight) {
+            tocElement.style.fontWeight = "700";
+            tocElement.style.color = '#e74300'
+        } else {
+            tocElement.style.fontWeight = "normal";
+            tocElement.style.color = 'inherit';
+        }
+      };
+
+      entries.forEach((entry) => {
+        visibilityCache[entry.target.id] = entry.isIntersecting;
+
+        for (let targetId in visibilityCache) {
+          updHighlightEntry(targetId, visibilityCache[targetId]);
+        }
+      });
+    }, options);
+
+    setTimeout(() => {
+      // delay the hook in case the toc was not loaded yet
+      for (let tocItem of document.querySelectorAll("[toc-id]")) {
+        observer.observe(tocItem);
+      }
+    }, 2000);
+  }
+</script>
